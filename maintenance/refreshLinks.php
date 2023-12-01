@@ -106,6 +106,12 @@ class RefreshLinks extends Maintenance {
 			$redir = $this->hasOption( 'redirects-only' );
 			$touched = $this->hasOption( 'touched-only' );
 			$what = $redir ? 'redirects' : 'links';
+			if ( $redir ) {
+				$builder->andWhere( [
+					$dbr->buildComparison( '<', [ 'page_len' => 240 ] ),
+					'page_is_redirect' => 0,
+				] );
+			}
 			if ( $new ) {
 				$builder->andWhere( [ 'page_is_new' => 1 ] );
 				$this->output( "Refreshing $what from new pages...\n" );
