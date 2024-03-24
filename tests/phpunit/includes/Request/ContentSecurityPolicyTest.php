@@ -19,6 +19,7 @@ class ContentSecurityPolicyTest extends MediaWikiIntegrationTestCase {
 		$this->overrideConfigValues( [
 			MainConfigNames::AllowExternalImages => false,
 			MainConfigNames::AllowExternalImagesFrom => [],
+			MainConfigNames::AllowImageTag => false,
 			MainConfigNames::EnableImageWhitelist => false,
 			MainConfigNames::LoadScript => false,
 			MainConfigNames::ExtensionAssetsPath => false,
@@ -268,6 +269,20 @@ class ContentSecurityPolicyTest extends MediaWikiIntegrationTestCase {
 
 	/**
 	 * @covers \MediaWiki\Request\ContentSecurityPolicy::makeCSPDirectives
+	 */
+	public function testMakeCSPDirectivesImage() {
+		global $wgAllowImageTag;
+		$origImg = wfSetVar( $wgAllowImageTag, true );
+
+		$actual = $this->csp->makeCSPDirectives( true, ContentSecurityPolicy::FULL_MODE );
+
+		$wgAllowImageTag = $origImg;
+		$expected = "script-src 'unsafe-eval' blob: 'self' 'unsafe-inline' sister-site.somewhere.com *.wikipedia.org; default-src * data: blob:; style-src * data: blob: 'unsafe-inline'; object-src 'none'; report-uri /w/api.php?action=cspreport&format=json";
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * @covers MediaWiki\Request\ContentSecurityPolicy::makeCSPDirectives
 	 */
 	public function testMakeCSPDirectivesReportUri() {
 		$actual = $this->csp->makeCSPDirectives(
