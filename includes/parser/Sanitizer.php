@@ -153,16 +153,20 @@ class Sanitizer {
 	 * @internal
 	 */
 	public static function getRecognizedTagData( array $extratags = [], array $removetags = [] ): array {
-		static $commonCase, $staticInitialised = false;
+		global $wgAllowImageTag;
+		static $commonCase, $staticInitialised;
 		$isCommonCase = ( $extratags === [] && $removetags === [] );
-		if ( $staticInitialised && $isCommonCase && $commonCase ) {
+		if ( $staticInitialised === $wgAllowImageTag && $isCommonCase && $commonCase ) {
 			return $commonCase;
 		}
 
 		static $htmlpairsStatic, $htmlsingle, $htmlsingleonly, $htmlnest, $tabletags,
 			$htmllist, $listtags, $htmlsingleallowed, $htmlelementsStatic;
 
-		if ( !$staticInitialised ) {
+		// Base our staticInitialised variable off of the global config state so that if the globals
+		// are changed (like in the screwed up test system) we will re-initialise the settings.
+		$globalContext = $wgAllowImageTag;
+		if ( !$staticInitialised || $staticInitialised !== $globalContext ) {
 			$htmlpairsStatic = [ # Tags that must be closed
 				'b', 'bdi', 'del', 'i', 'ins', 'u', 'font', 'big', 'small', 'sub', 'sup', 'h1',
 				'h2', 'h3', 'h4', 'h5', 'h6', 'cite', 'code', 'em', 's',
@@ -202,6 +206,13 @@ class Sanitizer {
 				'li',
 			];
 
+			if ( $wgAllowImageTag ) {
+				wfDeprecatedMsg( 'Setting $wgAllowImageTag to true ' .
+					'is deprecated since MediaWiki 1.35', '1.35', false, false );
+				$htmlsingle[] = 'img';
+				$htmlsingleonly[] = 'img';
+			}
+
 			$htmlsingleallowed = array_unique( array_merge( $htmlsingle, $tabletags ) );
 			$htmlelementsStatic = array_unique( array_merge( $htmlsingle, $htmlpairsStatic, $htmlnest ) );
 
@@ -211,13 +222,15 @@ class Sanitizer {
 			foreach ( $vars as $var ) {
 				$$var = array_fill_keys( $$var, true );
 			}
-			$staticInitialised = true;
+			$staticInitialised = $globalContext;
 		}
 
 		# Populate $htmlpairs and $htmlelements with the $extratags and $removetags arrays
 		$extratags = array_fill_keys( $extratags, true );
 		$removetags = array_fill_keys( $removetags, true );
+		// @phan-suppress-next-line PhanTypeMismatchArgumentNullableInternal The static var is always set
 		$htmlpairs = array_merge( $extratags, $htmlpairsStatic );
+		// @phan-suppress-next-line PhanTypeMismatchArgumentNullableInternal The static var is always set
 		$htmlelements = array_diff_key( array_merge( $extratags, $htmlelementsStatic ), $removetags );
 
 		$result = [
@@ -1538,7 +1551,8 @@ class Sanitizer {
 
 			# 13.2
 			# Not usually allowed, but may be used for extension-style hooks
-			# such as <math> when it is rasterized
+			# such as <math> when it is rasterized, or if $wgAllowImageTag is
+			# true
 			'img'        => $merge( $common, [ 'alt', 'src', 'width', 'height', 'srcset' ] ),
 			# Attributes for A/V tags added in T163583 / T133673
 			'audio'      => $merge( $common, [ 'controls', 'preload', 'width', 'height' ] ),
