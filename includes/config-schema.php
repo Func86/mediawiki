@@ -790,6 +790,7 @@ return [
 			'AllowExternalImages' => false,
 			'AllowExternalImagesFrom' => '',
 			'EnableImageWhitelist' => false,
+			'AllowImageTag' => false,
 			'TidyConfig' => [
 			],
 			'ParsoidSettings' => [
@@ -3319,6 +3320,9 @@ return [
 		],
 		'LegalTitleChars' => [
 			'deprecated' => 'since 1.41; use Extension:TitleBlacklist to customize',
+		],
+		'AllowImageTag' => [
+			'deprecated' => 'since 1.35; register an extension tag named <img> instead.',
 		],
 		'ParserEnableLegacyMediaDOM' => [
 			'deprecated' => 'since 1.41',
