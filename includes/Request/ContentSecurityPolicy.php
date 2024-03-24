@@ -246,6 +246,7 @@ class ContentSecurityPolicy {
 			// CSP puts on external images.
 			if ( $mwConfig->get( MainConfigNames::AllowExternalImages )
 				|| $mwConfig->get( MainConfigNames::AllowExternalImagesFrom )
+				|| $mwConfig->get( MainConfigNames::AllowImageTag )
 			) {
 				$imgSrc = [ '*', 'data:', 'blob:' ];
 			} elseif ( $mwConfig->get( MainConfigNames::EnableImageWhitelist ) ) {
