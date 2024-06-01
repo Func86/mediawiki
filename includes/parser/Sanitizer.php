@@ -207,8 +207,6 @@ class Sanitizer {
 			];
 
 			if ( $wgAllowImageTag ) {
-				wfDeprecatedMsg( 'Setting $wgAllowImageTag to true ' .
-					'is deprecated since MediaWiki 1.35', '1.35', false, false );
 				$htmlsingle[] = 'img';
 				$htmlsingleonly[] = 'img';
 			}
