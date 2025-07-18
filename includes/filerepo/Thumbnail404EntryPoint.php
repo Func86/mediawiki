@@ -32,6 +32,10 @@ use MediaWiki\MainConfigNames;
 
 class Thumbnail404EntryPoint extends ThumbnailEntryPoint {
 
+	protected function getFileRepo(): \FileRepo {
+		return $this->getServiceContainer()->getRepoGroup()->getRepoByName( 'sharedFsRepo' );
+	}
+
 	protected function handleRequest() {
 		$thumbPath = $this->getConfig( MainConfigNames::ThumbPath );
 
@@ -39,7 +43,7 @@ class Thumbnail404EntryPoint extends ThumbnailEntryPoint {
 			$relPath = $this->getRequestPathSuffix( $thumbPath );
 		} else {
 			// Determine the request path relative to the thumbnail zone base
-			$repo = $this->getServiceContainer()->getRepoGroup()->getLocalRepo();
+			$repo = $this->getFileRepo();
 			$baseUrl = $repo->getZoneUrl( 'thumb' );
 			if ( substr( $baseUrl, 0, 1 ) === '/' ) {
 				$basePath = $baseUrl;
@@ -79,7 +83,7 @@ class Thumbnail404EntryPoint extends ThumbnailEntryPoint {
 	 * @return array|null Associative params array or null
 	 */
 	protected function extractThumbRequestInfo( $thumbRel ) {
-		$repo = $this->getServiceContainer()->getRepoGroup()->getLocalRepo();
+		$repo = $this->getFileRepo();
 
 		$hashDirReg = $subdirReg = '';
 		$hashLevels = $repo->getHashLevels();

@@ -72,7 +72,8 @@ class ThumbnailEntryPoint extends MediaWikiEntryPoint {
 		// NOTE: This only works as long as to StreamFile::contentTypeFromPath
 		//       get this setting from global state. When StreamFile gets refactored,
 		//       we need to find a better way.
-		$wgTrivialMimeDetection = true;
+		// Hell...
+		// $wgTrivialMimeDetection = true;
 
 		$this->handleRequest();
 	}
@@ -87,8 +88,8 @@ class ThumbnailEntryPoint extends MediaWikiEntryPoint {
 		$this->streamThumb( $this->getRequest()->getQueryValuesOnly() );
 	}
 
-	private function getRepoGroup(): RepoGroup {
-		return $this->getServiceContainer()->getRepoGroup();
+	protected function getFileRepo(): \FileRepo {
+		return $this->getServiceContainer()->getRepoGroup()->getLocalRepo();
 	}
 
 	/**
@@ -131,11 +132,9 @@ class ThumbnailEntryPoint extends MediaWikiEntryPoint {
 		$isTemp = ( isset( $params['temp'] ) && $params['temp'] );
 		unset( $params['temp'] ); // handlers don't care
 
-		$services = $this->getServiceContainer();
-
 		// Some basic input validation
 		$fileName = strtr( $fileName, '\\/', '__' );
-		$localRepo = $services->getRepoGroup()->getLocalRepo();
+		$localRepo = $this->getFileRepo();
 		$archiveTimestamp = null;
 
 		// Actually fetch the image. Method depends on whether it is archived or not.
@@ -627,7 +626,7 @@ EOT;
 			// Check for file redirect
 			// Since redirects are associated with pages, not versions of files,
 			// we look for the most current version to see if its a redirect.
-			$localRepo = $this->getRepoGroup()->getLocalRepo();
+			$localRepo = $this->getFileRepo();
 			$possRedirFile = $localRepo->findFile( $img->getName() );
 			if ( $possRedirFile && $possRedirFile->getRedirected() !== null ) {
 				$redirTarget = $possRedirFile->getName();
