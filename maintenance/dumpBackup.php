@@ -64,6 +64,7 @@ TEXT
 		$this->addOption( 'end', 'Stop before page_id or log_id n (exclusive)', false, true );
 		$this->addOption( 'revstart', 'Start from rev_id', false, true );
 		$this->addOption( 'revend', 'Stop before rev_id n (exclusive)', false, true );
+		$this->addOption( 'revoffset', 'Start from rev_timestamp (exclusive)', false, true );
 		$this->addOption( 'skip-header', 'Don\'t output the <mediawiki> header' );
 		$this->addOption( 'skip-footer', 'Don\'t output the </mediawiki> footer' );
 		$this->addOption( 'stub', 'Don\'t perform old_text lookups; for 2-pass dump' );
@@ -92,6 +93,11 @@ TEXT
 			$this->dump( WikiExporter::LOGS );
 		} elseif ( $this->hasOption( 'revrange' ) ) {
 			$this->dump( WikiExporter::RANGE, $textMode );
+		} elseif ( $this->hasOption( 'revoffset' ) ) {
+			$this->dump( [
+				'dir' => 'asc',
+				'offset' => $this->getOption( 'revoffset' )
+			], $textMode );
 		} else {
 			$this->fatalError( 'No valid action specified.' );
 		}

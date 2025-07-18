@@ -341,7 +341,7 @@ abstract class BackupDumper extends Maintenance {
 			$exporter->openStream();
 		}
 		# Log item dumps: all or by range
-		if ( $history & WikiExporter::LOGS ) {
+		if ( !is_array( $history ) && $history & WikiExporter::LOGS ) {
 			if ( $this->startId || $this->endId ) {
 				$exporter->logsByRange( $this->startId, $this->endId );
 			} else {
@@ -372,7 +372,8 @@ abstract class BackupDumper extends Maintenance {
 	 * Initialise starting time and maximum revision count.
 	 * We'll make ETA calculations based on progress, assuming relatively
 	 * constant per-revision rate.
-	 * @param int $history WikiExporter::CURRENT or WikiExporter::FULL
+	 * @param int|array $history WikiExporter::CURRENT or WikiExporter::FULL
+	 *   or an associative array.
 	 */
 	public function initProgress( $history = WikiExporter::FULL ) {
 		$table = ( $history == WikiExporter::CURRENT ) ? 'page' : 'revision';
