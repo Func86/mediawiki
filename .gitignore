@@ -92,3 +92,7 @@ Thumbs.db
 docker-compose.override.yml
 .env
 /.stylelintcache
+
+# Production
+extensions/
+LocalSettings.*.php
