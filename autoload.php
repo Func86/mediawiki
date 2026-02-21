@@ -2918,6 +2918,7 @@ $wgAutoloadLocalClasses = [
 	'PerRowAugmentor' => __DIR__ . '/includes/search/PerRowAugmentor.php',
 	'PermissionsError' => __DIR__ . '/includes/exception/PermissionsError.php',
 	'Pingback' => __DIR__ . '/includes/installer/Pingback.php',
+	'PinyinCollation' => __DIR__ . '/includes/collation/PinyinCollation.php',
 	'PoolCounter' => __DIR__ . '/includes/poolcounter/PoolCounter.php',
 	'PoolCounterNull' => __DIR__ . '/includes/poolcounter/PoolCounterNull.php',
 	'PoolCounterRedis' => __DIR__ . '/includes/poolcounter/PoolCounterRedis.php',
