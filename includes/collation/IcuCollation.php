@@ -28,12 +28,12 @@ use MediaWiki\MediaWikiServices;
 class IcuCollation extends Collation {
 	private const FIRST_LETTER_VERSION = 5;
 
-	private Collator $primaryCollator;
-	private Collator $mainCollator;
+	protected Collator $primaryCollator;
+	protected Collator $mainCollator;
 
-	private string $langCode;
-	private string $locale;
-	private string $localeGroup;
+	protected string $langCode;
+	protected string $locale;
+	protected string $localeGroup;
 
 	protected Language $digitTransformLanguage;
 
@@ -344,8 +344,7 @@ class IcuCollation extends Collation {
 		return $this->mainCollator->getSortKey( $string );
 	}
 
-	public function getFirstLetter( $string ) {
-		$string = strval( $string );
+	protected function getRawSortLetter( string $string ): string {
 		if ( $string === '' ) {
 			return '';
 		}
@@ -379,7 +378,16 @@ class IcuCollation extends Collation {
 			return '';
 		}
 
-		$sortLetter = $letters[$min];
+		return $letters[$min];
+	}
+
+	/** @inheritDoc */
+	public function getFirstLetter( $string ) {
+		$sortLetter = $this->getRawSortLetter( strval( $string ) );
+		if ( $sortLetter === '' ) {
+			return '';
+		}
+
 		if ( str_starts_with( $sortLetter, "\u{FDD0}" ) ) {
 			$sortLetter = substr( $sortLetter, strlen( "\u{FDD0}" ) );
 		}
@@ -396,7 +404,7 @@ class IcuCollation extends Collation {
 		return $sortLetter;
 	}
 
-	private function getPrimarySortKey( $string ) {
+	protected function getPrimarySortKey( string $string ): string {
 		return $this->primaryCollator->getSortKey( $string );
 	}
 
