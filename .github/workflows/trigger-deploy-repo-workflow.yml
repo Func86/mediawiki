@@ -1,0 +1,26 @@
+name: Trigger Deploy Repo Workflow
+
+on:
+  push:
+    branches:
+      - REL1_43
+
+jobs:
+  trigger-deploy-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch workflow in deploy repository
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.DEPLOY_REPO_WORKFLOW_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: '${{ vars.DEPLOY_REPO_OWNER }}',
+              repo: '${{ vars.DEPLOY_REPO_NAME }}',
+              workflow_id: '${{ vars.DEPLOY_REPO_WORKFLOW_ID }}',
+              ref: '${{ vars.DEPLOY_REPO_WORKFLOW_REF }}',
+              inputs: {
+                source_sha: '${{ github.sha }}',
+                source_ref: '${{ github.ref }}'
+              }
+            });
